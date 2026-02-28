@@ -43,9 +43,6 @@ h2{
     list-style: none;
     color: white;
     padding: 15px;
-    
-    
-    
 
 }
 .head ul li a{
@@ -191,7 +188,7 @@ input{
 
 
 
-/* Style du conteneur principal */
+/* Style du conteneur principal tableau */
 .tableau {
     margin-top: 20px;
     margin-left: 30px;
@@ -243,6 +240,18 @@ input{
     font-weight: bold;
     color: #3498db;
 }
+
+/*table service*/
+textarea{
+    resize: none;
+    border-radius: 15px;
+    border:1px solid rgb(104, 50, 166);
+    outline: none;
+    height: 90px;
+
+}
+
+
 
 
 

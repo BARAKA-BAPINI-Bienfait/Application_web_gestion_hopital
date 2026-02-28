@@ -1,3 +1,101 @@
+<?php
+//connexion a la base de donnee
+include_once "connexion.php";
+
+//suppression de la base de donnee patients
+if (isset($_POST['delete'])) {
+    $numService = $_POST['numService'] ?? '';
+    $nomService  = $_POST['nomService'] ?? '';
+    $description   = $_POST['description'] ?? '';
+
+    $sql = "DELETE FROM services
+            WHERE id_services = ? 
+            AND nom_service = ? 
+            AND description = ?";
+
+    $requette = $basedonnee->prepare($sql);
+
+    $requette->execute([
+        $numService,
+        $nomService,
+        $description,
+    ]);
+
+    // Redirection pour rafraîchir le tableau
+    header('Location: services.php');
+    exit();
+}
+
+//insertion dans la base de donnee
+if (isset($_POST['ajouter'])) {
+    $numService  = $_POST['numService'];
+    $nomService  = $_POST['nomService'];
+    $description   = $_POST['description'];
+    if (
+        !empty($numService) && !empty($nomService) && !empty($description)
+    ) {
+
+        $sql = "INSERT INTO services (id_services, nom_service, description) 
+                VALUES (?, ?, ?)";
+
+        $requette = $basedonnee->prepare($sql);
+        try {
+            $requette->execute([
+                $numService,
+                $nomService,
+                $description,
+            ]);
+            header('location: services.php?action=erreur');
+        } catch (PDOException $e) {
+            if ($e->getCode() == 23000) {
+                header('location: services.php?action3=erreur');
+            } else {
+                echo "<p style='color:red;'>Erreur système : " . $e->getMessage() . "</p>";
+            }
+        }
+    }
+}
+//mise en jour de la base de donnee
+if (isset($_POST['modifier'])) {
+    $numService  = $_POST['numService'] ?? '';
+    $nomService  = $_POST['nomService'] ?? '';
+    $description = $_POST['description'] ?? '';
+ 
+    $sql = "UPDATE services SET 
+            nom_service = ?, 
+            description = ?
+            WHERE id_services = ?";
+
+    $requette = $basedonnee->prepare($sql);
+    $requette->execute([
+        $nomService,
+        $description,
+        $numService
+    ]);
+
+    header('Location: services.php');
+    exit();
+}
+
+// recherche des element dans la base de donnee
+if (isset($_POST['recherche']) && !empty($_POST['valeur_recherche'])) {
+    $recher = $_POST['valeur_recherche'];
+    $aff = $basedonnee->prepare('SELECT * FROM services WHERE id_services = ? OR nom_service LIKE ? ORDER BY nom_service ASC');
+    // Correction de la syntaxe des %
+    $aff->execute([$recher, "%$recher%"]); 
+} else {
+    $aff = $basedonnee->query('SELECT * FROM services ORDER BY nom_service ASC');
+}?>
+
+
+
+
+
+
+
+
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -12,6 +110,86 @@
             <li><a href="accueil.php">accueil</a></li>
         </ul>
     </header>
+    <div class="papa">
+        <div class="patientbig">
+
+            <form action="" method="post" class="patientformular">
+                <h2>services</h2>
+                <?php
+                if (isset($_GET['action'])) {
+                    echo "<p style='color:rgb(41, 10, 76); font-size: 15px;'>Service ajouté avec succès !</p>";
+                }
+                if (isset($_GET['action2'])) {
+                    echo "<p style='color:red;font-size:15px'>Veuillez remplir tous les champs.</p>";
+                }
+                ?>
+                <label for="">Numero service</label>
+                <input type="text" name="numService" autofocus required>
+                <label for="">Nom service</label>
+                <input type="text" name="nomService" autofocus required>
+                <label for="">Description</label>
+                <textarea name="description" id=""></textarea>
+                <div class="btn">
+                    <form action="">
+                        <button class="btna" name="ajouter">Ajouter</button>
+                    </form>
+                    <button class="btnm" name="modifier">Modifier</button>
+                    <button type="submit" class="btns" name="delete" onclick="return confirm('Supprimer ce message ?')">Supprimer</button>
+                    <input type="reset" value="Annuler">
+                </div>
+            </form>
+        </div>
+        <!--tableau-->
+        <div class="tableau">
+            <legend>Liste des services</legend>
+            <?php
+            if (isset($_GET['action3'])) {
+                echo "<p style='color:red;'>Le numéro de service existe déjà.</p>";
+            }
+            ?>
+            <div class="recherche">
+                <form action="services.php" method="post">
+                    <input type="text" name="valeur_recherche" placeholder="Reche.. par Id ou Nom" autofocus>
+                    <button type="submit" name="recherche">Recherche</button>
+                    <button type="reset"><a href="services.php">Voir plus</a></button>
+                </form>
+            </div>
+            <table class="tab">
+                <thead>
+                    <tr>
+                        <th>No</th>
+                        <th>Numero service</th>
+                        <th>Nom service</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php
+                    //$aff = $basedonnee->query('SELECT*FROM patients ORDER BY nom_patients ASC');
+                    $i = 1;
+                    while ($donnee = $aff->fetch()) {
+                        echo "<tr>";
+                        echo "<td>" . $i++ . "</td>";
+                        echo "<td>" . $donnee['id_services'] . "</td>";
+                        echo "<td>" . $donnee['nom_service'] . "</td>";
+                        echo "<td>" . $donnee['description'] . "</td>";
+                        echo "</tr>";
+                    }
+                    ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+
+
+
+
+
+
+
+
+
     
 </body>
 </html>

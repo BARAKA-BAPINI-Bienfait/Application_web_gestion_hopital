@@ -186,7 +186,7 @@ if (isset($_POST['recherche']) && !empty($_POST['valeur_recherche'])) {
                 <form action="patients.php" method="post">
                     <input type="text" name="valeur_recherche" placeholder="Reche.. par Id ou Nom" autofocus>
                     <button type="submit" name="recherche">Recherche</button>
-                    <button type="reset"><a href="patients.php">Reinitialiser</a></button>
+                    <button type="reset"><a href="patients.php">Avoir plus</a></button>
                 </form>
             </div>
             <table class="tab">
