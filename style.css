@@ -1,0 +1,253 @@
+@font-face {
+    font-family: 'Poppins';
+    src:url('FONT/Poppins-Regular.ttf')
+    format('truetype');
+    font-weight: 400;}
+/*@font-face {
+    font-family:'Poppins';
+    src: url('FONT/Poppins-Bold.ttf')
+    format('truetype');
+
+}*/
+@font-face {
+    font-family: 'Poppins';
+    src: url('FONT/Poppins-Light.ttf')
+    format('truectype');
+    font-weight: 700;
+}
+/*page entire*/
+*{
+    margin: 0;
+    padding: 0;
+    font-family: 'Poppins',sans-serif;
+    box-sizing: border-box;
+}
+/*heaer*/
+h2{
+    padding: 0%;
+}
+.head {
+    
+    
+}
+.head ul{
+    display: flex;
+    gap:1px;
+    justify-content: center;
+    margin: auto;
+   background-color: rgb(41, 10, 76);
+   
+
+}
+.head ul li {
+    list-style: none;
+    color: white;
+    padding: 15px;
+    
+    
+    
+
+}
+.head ul li a{
+    
+    text-decoration: none;
+    color: white;
+
+}
+.container{
+    
+    margin: auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    
+}
+h3{
+    position: relative;
+    left: 46px;
+}
+.formular{
+    position: relative;
+    top: 180px;
+    margin: auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+input{
+    border-radius: 10px;
+    margin-top: 10px;
+    
+    outline: none;
+    border: solid rgb(104, 50, 166) 1px ;
+    
+}
+.input1{
+    color: white;
+    background-color: rgb(104, 50, 166);
+
+}
+
+
+/*patients table*/
+.papa{
+    flex-wrap: wrap;
+    display: flex;
+
+}
+    
+    
+.patientbig{
+    display: flex;
+   flex-direction: column;
+   margin-left: 20px;
+
+    
+    width: 380px;
+
+}
+.patientformular{
+   display: flex;
+   flex-direction: column;
+   border: solid 1px rgb(104, 50, 166);
+   border-radius: 15px;
+   padding: 8px;
+   position: relative;
+   top: 25px;
+   box-shadow: 0px 2px 13px 3px rgb(104, 50, 166) ;
+   
+    
+    
+
+}.patientformular input{
+    border-radius: none;
+    padding: 5px;
+
+}.btna{
+
+    padding: 10px;
+    margin: 3px;
+    border-radius: 15px;
+    background-color: rgb(104, 50, 166);
+    color: white;
+    border: none;
+}
+.btn{
+    display: flex;
+    gap: 3px;
+}.btn form button{
+    padding: 9px;
+    margin: 3px;
+    border-radius: 15px;
+    background-color: rgb(104, 50, 166);
+    color: white;
+    border: none;
+}
+.btnm{
+    padding: 6px;
+    margin: 3px;
+    border-radius: 15px;
+    background-color: rgb(104, 50, 166);
+    color: white;
+    border: none;
+}
+.btns{
+    padding: 6px;
+    margin: 3px;
+    border-radius: 15px;
+    background-color: rgb(104, 50, 166);
+    color: white;
+    border: none;
+
+}
+
+.recherche{
+    display: flex;
+    position: relative;
+    top: -3px;
+    margin-left: 700px;
+    
+}
+.recherche form button{
+    padding: 6px;
+    border-radius: 15px;
+    background-color: rgb(104, 50, 166);
+    color: white;
+    border: none;
+   
+}
+.recherche form button a{
+    color: white;
+    text-decoration: none;
+}
+.btn input{
+    position: relative;
+    top: -8px;
+    border-radius: 15px;
+    padding: 6px;
+    color: white;
+    background-color:rgb(104, 50, 166) ;
+}
+
+
+
+/* Style du conteneur principal */
+.tableau {
+    margin-top: 20px;
+    margin-left: 30px;
+   
+}
+
+/* Personnalisation du titre (legend) */
+.tableau legend {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #2c3e50;
+    display: block; /* Nécessaire pour les bordures car legend est spécial */
+}
+
+/* Style de la table */
+.tab {
+    width: 100%;
+    border-collapse: collapse;
+    overflow: hidden; /* Pour l'arrondi des bordures */
+    border-radius: 15px;
+}
+
+/* En-tête du tableau */
+.tab thead tr {
+    background-color: rgb(104, 50, 166);
+    color: #ffffff;
+    text-align: left;
+    
+}
+
+.tab th, .tab td {
+    padding: 12px 15px;
+    border-bottom: 1px solid #eee;
+}
+
+/* Effet Zebra (alternance de couleurs) */
+.tab tbody tr:nth-of-type(even) {
+    background-color: #f8f9fa;
+}
+
+/* Effet au survol */
+.tab tbody tr:hover {
+    background-color: #e9ecef;
+    transition: 0.3s;
+}
+
+/* Mise en avant du numéro d'ordre (colonne $i) */
+.tab td:first-child {
+    font-weight: bold;
+    color: #3498db;
+}
+
+
+
+
+
+
+
+
