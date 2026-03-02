@@ -3,23 +3,10 @@
 include_once "connexion.php";
 
 //suppression de la base de donnee patients
-if (isset($_POST['delete'])) {
-    $numPersonnel = $_POST['numPersonnel'] ?? '';
-    $nomPersonnel  = $_POST['nomPersonnel'] ?? '';
-    $role = $_POST['role'] ?? '';
+if (isset($_POST['delete']) && isset($_POST['id_a_delete'])) {
+    $requette_del=$basedonnee->prepare('DELETE FROM personnels WHERE id_personnels=?');
+    $requette_del->execute([$_POST['id_a_delete']]);
 
-    $sql = "DELETE FROM personnels
-            WHERE id_personnels = ? 
-            AND nom_personnels = ? 
-            AND role = ?";
-
-    $requette = $basedonnee->prepare($sql);
-
-    $requette->execute([
-        $numPersonnel,
-        $nomPersonnel,
-        $role,
-    ]);
 
     // Redirection pour rafraîchir le tableau
     header('Location: personnels.php');
@@ -60,7 +47,7 @@ if (isset($_POST['modifier'])) {
     $numPersonnel  = $_POST['numPersonnel'] ?? '';
     $nomPersonnel  = $_POST['nomPersonnel'] ?? '';
     $role = $_POST['role'] ?? '';
- 
+
     $sql = "UPDATE personnels SET 
             nom_personnels = ?, 
             role = ?
@@ -82,21 +69,23 @@ if (isset($_POST['recherche']) && !empty($_POST['valeur_recherche'])) {
     $recher = $_POST['valeur_recherche'];
     $aff = $basedonnee->prepare('SELECT * FROM personnels WHERE id_personnels = ? OR nom_personnels LIKE ? ORDER BY nom_personnels ASC');
     // Correction de la syntaxe des %
-    $aff->execute([$recher, "%$recher%"]); 
+    $aff->execute([$recher, "%$recher%"]);
 } else {
     $aff = $basedonnee->query('SELECT * FROM personnels ORDER BY nom_personnels ASC');
-}?>
+} ?>
 
 
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css">
     <title>Personnels</title>
 </head>
+
 <body>
     <header class="head">
         <ul>
@@ -108,7 +97,7 @@ if (isset($_POST['recherche']) && !empty($_POST['valeur_recherche'])) {
         <div class="patientbig">
 
             <form action="" method="post" class="patientformular">
-                <h2>personnels</h2>
+                <h2>Personnels</h2>
                 <?php
                 if (isset($_GET['action'])) {
                     echo "<p style='color:rgb(41, 10, 76); font-size: 15px;'>Service ajouté avec succès !</p>";
@@ -128,7 +117,6 @@ if (isset($_POST['recherche']) && !empty($_POST['valeur_recherche'])) {
                         <button class="btna" name="ajouter">Ajouter</button>
                     </form>
                     <button class="btnm" name="modifier">Modifier</button>
-                    <button type="submit" class="btns" name="delete" onclick="return confirm('Supprimer ce message ?')">Supprimer</button>
                     <input type="reset" value="Annuler">
                 </div>
             </form>
@@ -155,6 +143,7 @@ if (isset($_POST['recherche']) && !empty($_POST['valeur_recherche'])) {
                         <th>Numero personnels</th>
                         <th>Nom personnels</th>
                         <th>role</th>
+                        <th>DEL</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -166,19 +155,32 @@ if (isset($_POST['recherche']) && !empty($_POST['valeur_recherche'])) {
                         echo "<td>" . $i++ . "</td>";
                         echo "<td>" . $donnee['id_personnels'] . "</td>";
                         echo "<td>" . $donnee['nom_personnels'] . "</td>";
-                        echo "<td>" . $donnee['role'] . "</td>";
-                        echo "</tr>";
+                        echo "<td>" . $donnee['role'] . "</td>"; ?>
+                        <!--gestion de button suppression-->
+                        <td>
+                            <form method="post" action="personnels.php">
+                                <input type='hidden' name='id_a_delete' value="<?php echo $donnee['id_personnels']; ?>">
+                                <button type="submit" name="delete" style='cursor:pointer;background-color: rgb(104, 50, 166);border:none;padding:1px;border-radius:8px;color:white;'
+                                    onclick="return confirm('voulez-vous supprimer ce personnel')">supprimer</button>
+                            </form>
+                        </td>
+                        <?php
+                        echo "</tr>"
+                        ?>
+                    <?php
                     }
                     ?>
+
                 </tbody>
             </table>
         </div>
     </div>
 
 
-    
-    
+
+
 
 
 </body>
+
 </html>

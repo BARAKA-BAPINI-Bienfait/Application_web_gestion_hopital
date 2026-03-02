@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="consultatio.css">
     <title>hospitalisation</title>
 </head>
 <body>
@@ -12,6 +12,8 @@
             <li><a href="accueil.php">accueil</a></li>
         </ul>
     </header>
+    
+    
     
 </body>
 </html>

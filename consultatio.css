@@ -98,10 +98,10 @@ input{
 .patientbig{
     display: flex;
    flex-direction: column;
-   margin-left: 20px;
+   margin-left: 18px;
 
     
-    width: 380px;
+    width: 340px;
 
 }
 .patientformular{
@@ -113,6 +113,7 @@ input{
    position: relative;
    top: 25px;
    box-shadow: 0px 2px 13px 3px rgb(104, 50, 166) ;
+   width: 350px;
    
     
     

@@ -3,39 +3,21 @@
 include_once "connexion.php";
 
 //suppression de la base de donnee patients
-if (isset($_POST['delete'])) {
-    $numpatient  = $_POST['numPatient'] ?? '';
-    $nomPatient  = $_POST['nomPatient'] ?? '';
-    $datenaiss   = $_POST['date'] ?? '';
-    $sexe        = $_POST['sexe'] ?? '';
-    $adresse     = $_POST['adresse'] ?? '';
-    $telephone   = $_POST['telepho'] ?? '';
-    $groupes     = $_POST['sanguin'] ?? '';
+if (isset($_POST['delete']) && isset($_POST['id_a_delete'])) {
 
-    $sql = "DELETE FROM patients 
-            WHERE id_patients = ? 
-            AND nom_patients = ? 
-            AND date_de_naissance = ? 
-            AND sexe = ? 
-            AND adresse = ? 
-            AND telephone = ? 
-            AND groupe_sanguin = ?";
+    $requette_del = $basedonnee->prepare('DELETE FROM patients WHERE id_patients=?');
 
-    $requette = $basedonnee->prepare($sql);
-
-    $requette->execute([
-        $numpatient,
-        $nomPatient,
-        $datenaiss,
-        $sexe,
-        $adresse,
-        $telephone,
-        $groupes
-    ]);
-
-    // Redirection pour rafraîchir le tableau
-    header('Location: patients.php');
-    exit();
+    try {
+        $requette_del->execute([$_POST['id_a_delete']]);
+        // Redirection pour rafraîchir le tableau
+        header('Location: patients.php');
+    } catch (PDOException $e) {
+        if ($e->getCode() == 23000) {
+            header('location:patients.php?exist=erreur');
+        } else {
+            echo "<p style='color:red;'>Erreur système : " . $e->getMessage() . "</p>";
+        }
+    }
 }
 
 //insertion dans la base de donnee
@@ -116,8 +98,9 @@ if (isset($_POST['recherche']) && !empty($_POST['valeur_recherche'])) {
     $recher = $_POST['valeur_recherche'];
     $aff = $basedonnee->prepare('SELECT * FROM patients WHERE id_patients = ? OR nom_patients LIKE ? ORDER BY nom_patients ASC');
     // Correction de la syntaxe des %
-    $aff->execute([$recher, "%$recher%"]); 
+    $aff->execute([$recher, "%$recher%"]);
 } else {
+    //affichage
     $aff = $basedonnee->query('SELECT * FROM patients ORDER BY nom_patients ASC');
 }
 ?>
@@ -169,7 +152,6 @@ if (isset($_POST['recherche']) && !empty($_POST['valeur_recherche'])) {
                         <button class="btna" name="ajouter">Ajouter</button>
                     </form>
                     <button class="btnm" name="modifier">Modifier</button>
-                    <button type="submit" class="btns" name="delete" onclick="return confirm('Supprimer ce message ?')">Supprimer</button>
                     <input type="reset" value="Annuler">
                 </div>
             </form>
@@ -178,6 +160,9 @@ if (isset($_POST['recherche']) && !empty($_POST['valeur_recherche'])) {
         <div class="tableau">
             <legend>Liste des patients</legend>
             <?php
+            if (isset($_GET['exist'])) {
+                    echo "<p style='color:red;font-size:15px'>patient est utilisee dans une autre table.</p>";
+                }
             if (isset($_GET['action3'])) {
                 echo "<p style='color:red;'>Le numéro de patient existe déjà.</p>";
             }
@@ -200,6 +185,7 @@ if (isset($_POST['recherche']) && !empty($_POST['valeur_recherche'])) {
                         <th>Adresse</th>
                         <th>Telephone</th>
                         <th>groupe sanguin</th>
+                        <th>DEL</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -216,9 +202,23 @@ if (isset($_POST['recherche']) && !empty($_POST['valeur_recherche'])) {
                         echo "<td>" . $donnee['adresse'] . "</td>";
                         echo "<td>" . $donnee['telephone'] . "</td>";
                         echo "<td>" . $donnee['groupe_sanguin'] . "</td>";
-                        echo "</tr>";
+                    ?>
+                        <!--gestion de button suppression-->
+                        <td>
+                            <form method="post" action="patients.php">
+                                <input type='hidden' name='id_a_delete' value="<?php echo $donnee['id_patients']; ?>">
+                                <button type="submit" name="delete" style='cursor:pointer;background-color: rgb(104, 50, 166);border:none;padding:1px;border-radius:8px;color:white;'
+                                    onclick="return confirm('voulez-vous supprimer ce agent')">supprimer</button>
+                            </form>
+                        </td>
+                        <?php
+                        echo "</tr>"
+                        ?>
+                    <?php
                     }
                     ?>
+
+
                 </tbody>
             </table>
         </div>

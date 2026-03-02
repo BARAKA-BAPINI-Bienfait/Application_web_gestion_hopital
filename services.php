@@ -3,27 +3,20 @@
 include_once "connexion.php";
 
 //suppression de la base de donnee patients
-if (isset($_POST['delete'])) {
-    $numService = $_POST['numService'] ?? '';
-    $nomService  = $_POST['nomService'] ?? '';
-    $description   = $_POST['description'] ?? '';
-
-    $sql = "DELETE FROM services
-            WHERE id_services = ? 
-            AND nom_service = ? 
-            AND description = ?";
-
-    $requette = $basedonnee->prepare($sql);
-
-    $requette->execute([
-        $numService,
-        $nomService,
-        $description,
-    ]);
-
-    // Redirection pour rafraîchir le tableau
-    header('Location: services.php');
-    exit();
+if (isset($_POST['delete']) && isset($_POST['id_a_delete'])) {
+    $requette_del = $basedonnee->prepare('DELETE FROM services WHERE id_services=?');
+    try {
+        $requette_del->execute([$_POST['id_a_delete']]);
+        // Redirection pour rafraîchir le tableau
+        header('Location: services.php');
+        exit();
+    } catch (PDOException $e) {
+        if ($e->getCode() == 23000) {
+            header('location:services.php?exist=erreur');
+        } else {
+            echo "<p style='color:red;'>Erreur système : " . $e->getMessage() . "</p>";
+        }
+    }
 }
 
 //insertion dans la base de donnee
@@ -60,7 +53,7 @@ if (isset($_POST['modifier'])) {
     $numService  = $_POST['numService'] ?? '';
     $nomService  = $_POST['nomService'] ?? '';
     $description = $_POST['description'] ?? '';
- 
+
     $sql = "UPDATE services SET 
             nom_service = ?, 
             description = ?
@@ -82,10 +75,10 @@ if (isset($_POST['recherche']) && !empty($_POST['valeur_recherche'])) {
     $recher = $_POST['valeur_recherche'];
     $aff = $basedonnee->prepare('SELECT * FROM services WHERE id_services = ? OR nom_service LIKE ? ORDER BY nom_service ASC');
     // Correction de la syntaxe des %
-    $aff->execute([$recher, "%$recher%"]); 
+    $aff->execute([$recher, "%$recher%"]);
 } else {
     $aff = $basedonnee->query('SELECT * FROM services ORDER BY nom_service ASC');
-}?>
+} ?>
 
 
 
@@ -98,12 +91,14 @@ if (isset($_POST['recherche']) && !empty($_POST['valeur_recherche'])) {
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css">
     <title>service</title>
 </head>
+
 <body>
     <header class="head">
         <ul>
@@ -134,7 +129,6 @@ if (isset($_POST['recherche']) && !empty($_POST['valeur_recherche'])) {
                         <button class="btna" name="ajouter">Ajouter</button>
                     </form>
                     <button class="btnm" name="modifier">Modifier</button>
-                    <button type="submit" class="btns" name="delete" onclick="return confirm('Supprimer ce message ?')">Supprimer</button>
                     <input type="reset" value="Annuler">
                 </div>
             </form>
@@ -143,6 +137,9 @@ if (isset($_POST['recherche']) && !empty($_POST['valeur_recherche'])) {
         <div class="tableau">
             <legend>Liste des services</legend>
             <?php
+            if (isset($_GET['exist'])) {
+                    echo "<p style='color:red;font-size:15px'>le service est utilisee dans une autre table.</p>";
+                }
             if (isset($_GET['action3'])) {
                 echo "<p style='color:red;'>Le numéro de service existe déjà.</p>";
             }
@@ -161,6 +158,7 @@ if (isset($_POST['recherche']) && !empty($_POST['valeur_recherche'])) {
                         <th>Numero service</th>
                         <th>Nom service</th>
                         <th>Description</th>
+                        <th>DEL</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -172,10 +170,22 @@ if (isset($_POST['recherche']) && !empty($_POST['valeur_recherche'])) {
                         echo "<td>" . $i++ . "</td>";
                         echo "<td>" . $donnee['id_services'] . "</td>";
                         echo "<td>" . $donnee['nom_service'] . "</td>";
-                        echo "<td>" . $donnee['description'] . "</td>";
-                        echo "</tr>";
+                        echo "<td>" . $donnee['description'] . "</td>"; ?>
+                        <!--gestion de button suppression-->
+                        <td>
+                            <form method="post" action="services.php">
+                                <input type='hidden' name='id_a_delete' value="<?php echo $donnee['id_services']; ?>">
+                                <button type="submit" name="delete" style='cursor:pointer;background-color: rgb(104, 50, 166);border:none;padding:1px;border-radius:8px;color:white;'
+                                    onclick="return confirm('voulez-vous supprimer ce service')">supprimer</button>
+                            </form>
+                        </td>
+                        <?php
+                        echo "</tr>"
+                        ?>
+                    <?php
                     }
                     ?>
+
                 </tbody>
             </table>
         </div>
@@ -190,6 +200,7 @@ if (isset($_POST['recherche']) && !empty($_POST['valeur_recherche'])) {
 
 
 
-    
+
 </body>
+
 </html>
