@@ -101,12 +101,12 @@ if (isset($_POST['modifier'])) {
 // recherche des element dans la base de donnee
 if (isset($_POST['recherche']) && !empty($_POST['valeur_recherche'])) {
     $recher = $_POST['valeur_recherche'];
-    $aff = $basedonnee->prepare('SELECT * FROM affichage_consultation WHERE id_consultation=? OR date_consultation LIKE ? ORDER BY date_consultation DESC');
+    $aff = $basedonnee->prepare('SELECT * FROM affichage_consultation_nom WHERE id_consultation=? OR date_consultation LIKE ? ORDER BY date_consultation DESC');
     // Correction de la syntaxe des %
     $aff->execute([$recher, "%$recher%"]);
 } else {
     //affichage sur le tabeau
-    $aff = $basedonnee->query('SELECT * FROM affichage_consultation ORDER BY date_consultation DESC');
+    $aff = $basedonnee->query('SELECT * FROM affichage_consultation_nom ORDER BY nom_patients DESC');
 } ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -219,10 +219,10 @@ if (isset($_POST['recherche']) && !empty($_POST['valeur_recherche'])) {
                         <th>Diagnos.</th>
                         <th>Prescription</th>
                         <th>Motif</th>
-                        <th>Num.patient</th>
-                        <th>Num.service</th>
-                        <th>Num.person.</th>
-                        <th>DEL</th>
+                        <th>Nom patient</th>
+                        <th>Nom service</th>
+                        <th>Nom person.</th>
+                        <th>ACTION</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -237,9 +237,9 @@ if (isset($_POST['recherche']) && !empty($_POST['valeur_recherche'])) {
                         echo "<td>" . $donnee['diagnostique'] . "</td>";
                         echo "<td>" . $donnee['prescription'] . "</td>";
                         echo "<td>" . $donnee['motif'] . "</td>";
-                        echo "<td>" . $donnee['id_patients'] . "</td>";
-                        echo "<td>" . $donnee['id_services'] . "</td>";
-                        echo "<td>" . $donnee['id_personnels'] . "</td>"; ?>
+                        echo "<td>" . $donnee['nom_patients'] . "</td>";
+                        echo "<td>" . $donnee['nom_service'] . "</td>";
+                        echo "<td>" . $donnee['nom_personnels'] . "</td>"; ?>
                         <!--gestion de button suppression-->
                         <td>
                             <form method="post" action="consultation.php">
