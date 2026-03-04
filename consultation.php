@@ -55,7 +55,7 @@ if (isset($_POST['ajouter'])) {
                 $service,
                 $personnel,
             ]);
-            header('location: consultation.php?action=ok');
+            header('location: consultation.php?action1=ok');
        }catch(Exception $e){
             header('Location:consultation.php?action=erreur');
     }
@@ -130,7 +130,7 @@ if (isset($_POST['recherche']) && !empty($_POST['valeur_recherche'])) {
             <form action="consultation.php" method="post" class="patientformular">
                 <h2>consultation</h2>
                 <?php
-                if (isset($_GET['action'])) {
+                if (isset($_GET['action1'])) {
                     echo "<p style='color:rgb(41, 10, 76); font-size: 15px;'>Consultation ajouté avec succès !</p>";
                 }
                 if (isset($_GET['action2'])) {

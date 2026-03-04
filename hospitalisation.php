@@ -1,11 +1,122 @@
+<?php
+//connexion a la base de donnee
+include_once "connexion.php";
+
+//gestion des menus deroulants
+//patient
+$patient = $basedonnee->query('SELECT id_patients,nom_patients FROM patients ORDER BY nom_patients');
+//consultation
+$consultation = $basedonnee->query('SELECT * from affichage_de_consultation_pour_la_quelle_pas_dhospitalisation order by date_consultation desc');
+//service
+$service = $basedonnee->query('SELECT id_services, nom_service FROM services ORDER BY nom_service');
+//personnel
+$personnel = $basedonnee->query('SELECT id_personnels, nom_personnels FROM personnels ORDER BY nom_personnels');
+
+//suppression de la base de donnee patients
+if (isset($_POST['delete']) && isset($_POST['id_a_delete'])) {
+    $requette_del = $basedonnee->prepare('DELETE FROM hospitalisation WHERE id_hospitalisation=?');
+    try {
+        $requette_del->execute([$_POST['id_a_delete']]);
+        // Redirection pour rafraîchir le tableau
+        header('Location: hospitalisation.php');
+    } catch (PDOException $e) {
+        if ($e->getCode() == 23000) {
+            header('location:hospitalisation.php?exist=erreur');
+        } else {
+            echo "<p style='color:red;'>Erreur système : " . $e->getMessage() . "</p>";
+        }
+    }
+}
+
+//insertion dans la base de donnee
+if (isset($_POST['ajouter'])) {
+    $numHospitalisation = $_POST['hospitalisation'];
+    $dataEntre  = $_POST['dateen'];
+    $dateSortie = $_POST['dates'];
+    $numPatient = $_POST['id_patient'];
+    $numConsultation = $_POST['id_consultation'];
+    $numService = $_POST['id_services'];
+    $numPersonnel = $_POST['id_personnels'];
+
+    if (
+        !empty($numHospitalisation) && !empty($dataEntre) && !empty($dateSortie) && !empty($numPatient) && !empty($numConsultation) && !empty($numService)
+        && !empty($numPersonnel)
+    ) {
+        try {
+            $sql = "INSERT INTO hospitalisation (id_hospitalisation, date_entree, date_sortie, id_patients, id_consultation,
+        id_services, id_personnels) values (?,?,?,?,?,?,?)";
+            $requette = $basedonnee->prepare($sql);
+            $requette->execute([
+                $numHospitalisation,
+                $dataEntre,
+                $dateSortie,
+                $numPatient,
+                $numConsultation,
+                $numService,
+                $numPersonnel,
+            ]);
+            header('location: hospitalisation.php?action1=ok');
+        } catch (Exception $e) {
+            header('Location:hospitalisation.php?date=erreur');
+        }
+    }
+}
+
+//mise en jour de la base de donnee
+if (isset($_POST['modifier'])) {
+    $numHospitalisation = $_POST['hospitalisation'] ?? '';
+    $dataEntre  = $_POST['dateen'] ?? '';
+    $dateSortie = $_POST['dates'] ?? '';
+    $numPatient = $_POST['id_patients'] ?? '';
+    $numConsultation = $_POST['id_consultation'] ?? '';
+    $numService = $_POST['id_services'] ?? '';
+    $numPersonnel = $_POST['id_personnels'] ?? '';
+
+    $sql = "UPDATE hospitalisation SET 
+            date_entree = ?, 
+            date_sortie = ?,
+            id_patients = ?,
+            id_consultation =?,
+            id_services = ?,
+            id_personnels = ?
+            WHERE id_hospitalisation = ?";
+
+    $requette = $basedonnee->prepare($sql);
+    $requette->execute([
+        $dataEntre,
+        $dateSortie,
+        $numPatient,
+        $numConsultation,
+        $numService,
+        $numPersonnel,
+        $numHospitalisation
+    ]);
+
+    header('Location: hospitalisation.php');
+    exit();
+}
+
+// recherche des element dans la base de donnee
+if (isset($_POST['recherche']) && !empty($_POST['valeur_recherche'])) {
+    $recher = $_POST['valeur_recherche'];
+    $aff = $basedonnee->prepare('SELECT * FROM affichage_hospitalisation WHERE id_consultation=? OR nom_patients LIKE ? ORDER BY date_entree DESC');
+    // Correction de la syntaxe des %
+    $aff->execute([$recher, "%$recher%"]);
+} else {
+    //affichage sur le tabeau
+    $aff = $basedonnee->query('SELECT * FROM affichage_hospitalisation ORDER BY date_entree DESC');
+} ?>
+
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="consultatio.css">
     <title>hospitalisation</title>
 </head>
+
 <body>
     <header class="head">
         <ul>
@@ -16,21 +127,22 @@
         <div class="patientbig">
 
             <form action="hospitalisation.php" method="post" class="patientformular">
-                <h2>consultation</h2>
+                <h2>Hospitalisation</h2>
                 <?php
-                if (isset($_GET['action'])) {
+                if (isset($_GET['action1'])) {
                     echo "<p style='color:rgb(41, 10, 76); font-size: 15px;'>Hospitalisation ajouté avec succès !</p>";
                 }
-                if (isset($_GET['action2'])) {
-                    echo "<p style='color:red;font-size:15px'>Veuillez remplir tous les champs.</p>";
+                if (isset($_GET['date'])) {?>
+                <script type="text/javascript"> alert('erreur de la date')</script>
+                    <?php 
                 }
                 ?>
                 <label for="">Numero hospitalisation</label>
                 <input type="text" name="hospitalisation">
                 <label for="">Date d'entree</label>
-                <input type="date" name="dateen" autofocus required>
+                <input type="date" name="dateen" autofocus required value=".../.../...">
                 <label for="">Date sortie</label>
-                <input type="text" name="dates">
+                <input type="date" name="dates" value=".../.../..." autofocus required>
                 <!--menu deroulants-->
                 <label for="patient_select">Patient</label>
                 <select name="id_patient" id="patient_select" required class="deroulant_patient">
@@ -51,7 +163,9 @@
                     while ($c = $consultation->fetch(PDO::FETCH_ASSOC)) {
                     ?>
                         <option value="<?= $c['id_consultation'] ?>">
-                            <?= htmlspecialchars($p['id_consultation']) ?>
+                            consultation du <?= htmlspecialchars($c['date_consultation']) ?>
+                            -Patient:<?= htmlspecialchars($c['nom_patients']) ?>
+                            -Diagnostique:<?= htmlspecialchars($c['diagnostique']) ?>
                         </option>
                     <?php } ?>
                 </select>
@@ -89,20 +203,20 @@
         </div>
         <!--tableau-->
         <div class="tableau">
-            <legend>Liste des consultation</legend>
+            <legend>Liste d'hospitalisation</legend>
             <?php
             if (isset($_GET['action'])) {
                 echo "<p style='color:red;'>Le numéro existe déjà.</p>";
             }
             if (isset($_GET['exist'])) {
-                    echo "<p style='color:red;font-size:15px'>consultation est dans une autre table.</p>";
-                }
+                echo "<p style='color:red;font-size:15px'>consultation est dans une autre table.</p>";
+            }
             ?>
             <div class="recherche">
-                <form action="consultation.php" method="post">
+                <form action="hospitalisation.php" method="post">
                     <input type="text" name="valeur_recherche" placeholder="Reche.. par Id ou Patient" autofocus>
                     <button type="submit" name="recherche">Recherche</button>
-                    <button type="reset"><a href="consultation.php">Voir plus</a></button>
+                    <button type="reset"><a href="hospitalisation.php">Voir plus</a></button>
                 </form>
             </div>
             <table class="tab">
@@ -112,11 +226,10 @@
                         <th>Num.hospitalisation</th>
                         <th>Date d'entre</th>
                         <th>Date de sortie</th>
-                        <th>Num</th>
-                        <th>Motif</th>
-                        <th>Num.patient</th>
-                        <th>Num.service</th>
-                        <th>Num.person.</th>
+                        <th>Nom patient</th>
+                        <th>Num consulta.</th>
+                        <th>Nom service</th>
+                        <th>Nom personnel</th>
                         <th>DEL</th>
                     </tr>
                 </thead>
@@ -127,18 +240,18 @@
                     while ($donnee = $aff->fetch()) {
                         echo "<tr>";
                         echo "<td>" . $i++ . "</td>";
+                        echo "<td>" . $donnee['id_hospitalisation'] . "</td>";
+                        echo "<td>" . $donnee['date_entree'] . "</td>";
+                        echo "<td>" . $donnee['date_sortie'] . "</td>";
+                        echo "<td>" . $donnee['nom_patients'] . "</td>";
                         echo "<td>" . $donnee['id_consultation'] . "</td>";
-                        echo "<td>" . $donnee['date_consultation'] . "</td>";
-                        echo "<td>" . $donnee['diagnostique'] . "</td>";
-                        echo "<td>" . $donnee['prescription'] . "</td>";
-                        echo "<td>" . $donnee['motif'] . "</td>";
-                        echo "<td>" . $donnee['id_patients'] . "</td>";
-                        echo "<td>" . $donnee['id_services'] . "</td>";
-                        echo "<td>" . $donnee['id_personnels'] . "</td>"; ?>
-                        <!--gestion de button suppression-->
+                        echo "<td>" . $donnee['nom_service'] . "</td>";
+                        echo "<td>" . $donnee['nom_personnels'] . "</td>"; 
+                    ?>
+                    <!--gestion de button suppression-->
                         <td>
-                            <form method="post" action="consultation.php">
-                                <input type='hidden' name='id_a_delete' value="<?php echo $donnee['id_consultation'];?>">
+                            <form method="post" action="hospitalisation.php">
+                                <input type='hidden' name='id_a_delete' value="<?php echo $donnee['id_hospitalisation']; ?>">
                                 <button type="submit" name="delete" style='cursor:pointer;background-color: rgb(104, 50, 166);border:none;padding:1px;border-radius:8px;color:white;'
                                     onclick="return confirm('voulez-vous supprimer')">supprimer</button>
                             </form>
@@ -154,7 +267,8 @@
         </div>
     </div>
 
-    
-    
+
+
 </body>
+
 </html>
