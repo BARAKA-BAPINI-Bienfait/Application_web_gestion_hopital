@@ -1,4 +1,9 @@
 <?php
+session_start();
+if (!isset($_SESSION['user'])) {
+    header('Location: login.php');
+    exit(); 
+}
 //connexion a la base de donnee
 include_once "connexion.php";
 
@@ -111,8 +116,11 @@ if (isset($_POST['recherche']) && !empty($_POST['valeur_recherche'])) {
             <form action="" method="post" class="patientformular">
                 <h2>services</h2>
                 <?php
-                if (isset($_GET['action'])) {
-                    echo "<p style='color:rgb(41, 10, 76); font-size: 15px;'>Service ajouté avec succès !</p>";
+                if (isset($_GET['action'])) { ?>
+                    <script type="text/javascript">
+                        alert('Service ajouté avec succès !')
+                    </script>
+                <?php
                 }
                 if (isset($_GET['action2'])) {
                     echo "<p style='color:red;font-size:15px'>Veuillez remplir tous les champs.</p>";
@@ -137,9 +145,12 @@ if (isset($_POST['recherche']) && !empty($_POST['valeur_recherche'])) {
         <div class="tableau">
             <legend>Liste des services</legend>
             <?php
-            if (isset($_GET['exist'])) {
-                    echo "<p style='color:red;font-size:15px'>le service est utilisee dans une autre table.</p>";
-                }
+            if (isset($_GET['exist'])) { ?>
+                <script type="text/javascript">
+                    alert('le service est utilisee dans une autre table')
+                </script>
+            <?php
+            }
             if (isset($_GET['action3'])) {
                 echo "<p style='color:red;'>Le numéro de service existe déjà.</p>";
             }
@@ -190,15 +201,6 @@ if (isset($_POST['recherche']) && !empty($_POST['valeur_recherche'])) {
             </table>
         </div>
     </div>
-
-
-
-
-
-
-
-
-
 
 
 </body>

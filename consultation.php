@@ -1,4 +1,9 @@
 <?php
+session_start();
+if (!isset($_SESSION['user'])) {
+    header('Location: login.php');
+    exit(); 
+}
 //connexion a la base de donnee
 include_once "connexion.php";
 
@@ -130,8 +135,9 @@ if (isset($_POST['recherche']) && !empty($_POST['valeur_recherche'])) {
             <form action="consultation.php" method="post" class="patientformular">
                 <h2>consultation</h2>
                 <?php
-                if (isset($_GET['action1'])) {
-                    echo "<p style='color:rgb(41, 10, 76); font-size: 15px;'>Consultation ajouté avec succès !</p>";
+                if (isset($_GET['action1'])) {?>
+                    <script type="text/javascript"> alert('Consultation ajouté avec succès !')</script>
+                    <?php
                 }
                 if (isset($_GET['action2'])) {
                     echo "<p style='color:red;font-size:15px'>Veuillez remplir tous les champs.</p>";
@@ -196,11 +202,13 @@ if (isset($_POST['recherche']) && !empty($_POST['valeur_recherche'])) {
         <div class="tableau">
             <legend>Liste des personnels</legend>
             <?php
-            if (isset($_GET['action'])) {
-                echo "<p style='color:red;'>Le numéro existe déjà.</p>";
+            if (isset($_GET['action'])) {?>
+                <script type="text/javascript"> alert('Le numéro existe déjà !')</script>
+                <?php
             }
-            if (isset($_GET['exist'])) {
-                    echo "<p style='color:red;font-size:15px'>consultation est dans une autre table.</p>";
+            if (isset($_GET['exist'])) {?>
+                    <script type="text/javascript"> alert('consultation est dans une autre table.')</script>
+                    <?php
                 }
             ?>
             <div class="recherche">

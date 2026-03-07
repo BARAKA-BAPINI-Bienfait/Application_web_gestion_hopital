@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1
--- Généré le : sam. 28 fév. 2026 à 10:14
+-- Généré le : sam. 07 mars 2026 à 12:18
 -- Version du serveur : 10.4.32-MariaDB
 -- Version de PHP : 8.0.30
 
@@ -24,12 +24,109 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
+-- Doublure de structure pour la vue `affichage_consultation`
+-- (Voir ci-dessous la vue réelle)
+--
+CREATE TABLE `affichage_consultation` (
+`id_consultation` int(40)
+,`date_consultation` date
+,`diagnostique` varchar(100)
+,`prescription` varchar(100)
+,`motif` varchar(100)
+,`id_patients` int(40)
+,`id_services` int(40)
+,`id_personnels` int(40)
+);
+
+-- --------------------------------------------------------
+
+--
+-- Doublure de structure pour la vue `affichage_consultation_nom`
+-- (Voir ci-dessous la vue réelle)
+--
+CREATE TABLE `affichage_consultation_nom` (
+`id_consultation` int(40)
+,`date_consultation` date
+,`diagnostique` varchar(100)
+,`prescription` varchar(100)
+,`motif` varchar(100)
+,`nom_patients` varchar(30)
+,`nom_service` varchar(30)
+,`nom_personnels` varchar(30)
+);
+
+-- --------------------------------------------------------
+
+--
+-- Doublure de structure pour la vue `affichage_de_consultation_pour_la_quelle_pas_dhospitalisation`
+-- (Voir ci-dessous la vue réelle)
+--
+CREATE TABLE `affichage_de_consultation_pour_la_quelle_pas_dhospitalisation` (
+`id_consultation` int(40)
+,`date_consultation` date
+,`nom_patients` varchar(30)
+,`diagnostique` varchar(100)
+);
+
+-- --------------------------------------------------------
+
+--
+-- Doublure de structure pour la vue `affichage_hospitalisation`
+-- (Voir ci-dessous la vue réelle)
+--
+CREATE TABLE `affichage_hospitalisation` (
+`id_hospitalisation` int(40)
+,`date_entree` date
+,`date_sortie` date
+,`nom_patients` varchar(30)
+,`id_consultation` int(40)
+,`nom_service` varchar(30)
+,`nom_personnels` varchar(30)
+);
+
+-- --------------------------------------------------------
+
+--
+-- Doublure de structure pour la vue `affichage_patient_consultee`
+-- (Voir ci-dessous la vue réelle)
+--
+CREATE TABLE `affichage_patient_consultee` (
+`id_patients` int(40)
+,`nom_patients` varchar(30)
+);
+
+-- --------------------------------------------------------
+
+--
+-- Doublure de structure pour la vue `affichage_payement`
+-- (Voir ci-dessous la vue réelle)
+--
+CREATE TABLE `affichage_payement` (
+`id_payement` int(40)
+,`date_payement` date
+,`montant` double(12,2)
+,`mode_payement` varchar(40)
+,`statut` varchar(40)
+,`nom_patients` varchar(30)
+,`service_consultation` varchar(30)
+,`service_hospitalisation` varchar(30)
+,`id_consultation` int(40)
+,`date_consultation` date
+,`prescription` varchar(100)
+,`id_hospitalisation` int(40)
+,`date_entree` date
+,`date_sortie` date
+);
+
+-- --------------------------------------------------------
+
+--
 -- Structure de la table `consultation`
 --
 
 CREATE TABLE `consultation` (
   `id_consultation` int(40) NOT NULL,
-  `date_consultation` datetime DEFAULT NULL,
+  `date_consultation` date DEFAULT NULL,
   `diagnostique` varchar(100) DEFAULT NULL,
   `prescription` varchar(100) DEFAULT NULL,
   `motif` varchar(100) DEFAULT NULL,
@@ -37,6 +134,14 @@ CREATE TABLE `consultation` (
   `id_services` int(40) NOT NULL,
   `id_personnels` int(40) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Déchargement des données de la table `consultation`
+--
+
+INSERT INTO `consultation` (`id_consultation`, `date_consultation`, `diagnostique`, `prescription`, `motif`, `id_patients`, `id_services`, `id_personnels`) VALUES
+(2, '2026-03-29', 'sida', 'para', 'mot de tete', 1, 12, 2),
+(100, '2026-03-28', 'sida', 'para', 'mot de tete', 2, 12, 2);
 
 -- --------------------------------------------------------
 
@@ -46,8 +151,8 @@ CREATE TABLE `consultation` (
 
 CREATE TABLE `hospitalisation` (
   `id_hospitalisation` int(40) NOT NULL,
-  `date_entree` datetime DEFAULT NULL,
-  `date_sortie` datetime DEFAULT NULL,
+  `date_entree` date DEFAULT NULL,
+  `date_sortie` date DEFAULT NULL,
   `id_patients` int(40) NOT NULL,
   `id_consultation` int(40) NOT NULL,
   `id_services` int(40) NOT NULL,
@@ -75,11 +180,8 @@ CREATE TABLE `patients` (
 --
 
 INSERT INTO `patients` (`id_patients`, `nom_patients`, `date_de_naissance`, `sexe`, `adresse`, `telephone`, `groupe_sanguin`) VALUES
-(1, 'PALUKU MUHYANA', '2026-02-10', 'M', 'HOHO', '0813456738', 'AB'),
-(2, 'BARAKA BAPINI BIENFAIT', '2026-02-07', 'M', 'HOHO', '0813456738', 'AB'),
-(3, 'MAKI PANZA', '2026-02-12', 'M', 'BAKOKO', '0843564758', 'A'),
-(4, 'FAIDA MWESIGE', '2026-02-11', 'M', 'KINDIA', '0821135167', 'A'),
-(7, 'PACIFIC', '2026-02-13', 'm', 'HOHO', '0813456738', 'AB');
+(1, 'BARAKA BAPINI BIENFAIT', '2004-01-14', 'M', 'HOHO', '0813456738', 'O'),
+(2, 'PACIFIC', '2005-06-08', 'M', 'HOHO', '0813456730', 'A');
 
 -- --------------------------------------------------------
 
@@ -89,13 +191,40 @@ INSERT INTO `patients` (`id_patients`, `nom_patients`, `date_de_naissance`, `sex
 
 CREATE TABLE `payement` (
   `id_payement` int(40) NOT NULL,
-  `date_payement` datetime DEFAULT NULL,
+  `date_payement` date DEFAULT NULL,
   `montant` double(12,2) DEFAULT NULL,
   `mode_payement` varchar(40) DEFAULT NULL,
   `statut` varchar(40) DEFAULT NULL,
   `id_consultation` int(40) NOT NULL,
   `id_hospitalisation` int(40) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Doublure de structure pour la vue `payement_consultation`
+-- (Voir ci-dessous la vue réelle)
+--
+CREATE TABLE `payement_consultation` (
+`id_consultation` int(40)
+,`nom_patients` varchar(30)
+,`date_consultation` date
+,`prescription` varchar(100)
+,`nom_service` varchar(30)
+);
+
+-- --------------------------------------------------------
+
+--
+-- Doublure de structure pour la vue `payement_hospitalisation`
+-- (Voir ci-dessous la vue réelle)
+--
+CREATE TABLE `payement_hospitalisation` (
+`id_hospitalisation` int(40)
+,`nom_patients` varchar(30)
+,`date_entree` date
+,`nom_service` varchar(30)
+);
 
 -- --------------------------------------------------------
 
@@ -109,6 +238,13 @@ CREATE TABLE `personnels` (
   `role` varchar(100) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Déchargement des données de la table `personnels`
+--
+
+INSERT INTO `personnels` (`id_personnels`, `nom_personnels`, `role`) VALUES
+(2, 'JALOUS', 'informaticien');
+
 -- --------------------------------------------------------
 
 --
@@ -120,6 +256,87 @@ CREATE TABLE `services` (
   `nom_service` varchar(30) DEFAULT NULL,
   `description` varchar(100) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Déchargement des données de la table `services`
+--
+
+INSERT INTO `services` (`id_services`, `nom_service`, `description`) VALUES
+(10, 'medecine interne', 'soin'),
+(11, 'chirugie', 'operation'),
+(12, 'cabinet consultation', 'consultation');
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la vue `affichage_consultation`
+--
+DROP TABLE IF EXISTS `affichage_consultation`;
+
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `affichage_consultation`  AS   (select `consultation`.`id_consultation` AS `id_consultation`,`consultation`.`date_consultation` AS `date_consultation`,`consultation`.`diagnostique` AS `diagnostique`,`consultation`.`prescription` AS `prescription`,`consultation`.`motif` AS `motif`,`patients`.`id_patients` AS `id_patients`,`services`.`id_services` AS `id_services`,`personnels`.`id_personnels` AS `id_personnels` from (((`consultation` join `patients` on(`consultation`.`id_patients` = `patients`.`id_patients`)) join `services` on(`consultation`.`id_services` = `services`.`id_services`)) join `personnels` on(`consultation`.`id_personnels` = `personnels`.`id_personnels`)) order by `consultation`.`id_consultation` desc)  ;
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la vue `affichage_consultation_nom`
+--
+DROP TABLE IF EXISTS `affichage_consultation_nom`;
+
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `affichage_consultation_nom`  AS   (select `consultation`.`id_consultation` AS `id_consultation`,`consultation`.`date_consultation` AS `date_consultation`,`consultation`.`diagnostique` AS `diagnostique`,`consultation`.`prescription` AS `prescription`,`consultation`.`motif` AS `motif`,`patients`.`nom_patients` AS `nom_patients`,`services`.`nom_service` AS `nom_service`,`personnels`.`nom_personnels` AS `nom_personnels` from (((`consultation` join `patients` on(`consultation`.`id_patients` = `patients`.`id_patients`)) join `services` on(`consultation`.`id_services` = `services`.`id_services`)) join `personnels` on(`consultation`.`id_personnels` = `personnels`.`id_personnels`)))  ;
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la vue `affichage_de_consultation_pour_la_quelle_pas_dhospitalisation`
+--
+DROP TABLE IF EXISTS `affichage_de_consultation_pour_la_quelle_pas_dhospitalisation`;
+
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `affichage_de_consultation_pour_la_quelle_pas_dhospitalisation`  AS   (select `consultation`.`id_consultation` AS `id_consultation`,`consultation`.`date_consultation` AS `date_consultation`,`patients`.`nom_patients` AS `nom_patients`,`consultation`.`diagnostique` AS `diagnostique` from (`consultation` join `patients` on(`consultation`.`id_patients` = `patients`.`id_patients`)) where !exists(select 1 from `hospitalisation` where `hospitalisation`.`id_consultation` = `consultation`.`id_consultation` limit 1))  ;
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la vue `affichage_hospitalisation`
+--
+DROP TABLE IF EXISTS `affichage_hospitalisation`;
+
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `affichage_hospitalisation`  AS   (select `hospitalisation`.`id_hospitalisation` AS `id_hospitalisation`,`hospitalisation`.`date_entree` AS `date_entree`,`hospitalisation`.`date_sortie` AS `date_sortie`,`patients`.`nom_patients` AS `nom_patients`,`consultation`.`id_consultation` AS `id_consultation`,`services`.`nom_service` AS `nom_service`,`personnels`.`nom_personnels` AS `nom_personnels` from ((((`hospitalisation` join `patients` on(`hospitalisation`.`id_patients` = `patients`.`id_patients`)) join `consultation` on(`hospitalisation`.`id_consultation` = `consultation`.`id_consultation`)) join `services` on(`hospitalisation`.`id_services` = `services`.`id_services`)) join `personnels` on(`hospitalisation`.`id_personnels` = `personnels`.`id_personnels`)))  ;
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la vue `affichage_patient_consultee`
+--
+DROP TABLE IF EXISTS `affichage_patient_consultee`;
+
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `affichage_patient_consultee`  AS   (select `patients`.`id_patients` AS `id_patients`,`patients`.`nom_patients` AS `nom_patients` from (`patients` join `consultation` on(`patients`.`id_patients` = `consultation`.`id_patients`)))  ;
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la vue `affichage_payement`
+--
+DROP TABLE IF EXISTS `affichage_payement`;
+
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `affichage_payement`  AS   (select `payement`.`id_payement` AS `id_payement`,`payement`.`date_payement` AS `date_payement`,`payement`.`montant` AS `montant`,`payement`.`mode_payement` AS `mode_payement`,`payement`.`statut` AS `statut`,`patients`.`nom_patients` AS `nom_patients`,`s1`.`nom_service` AS `service_consultation`,`s2`.`nom_service` AS `service_hospitalisation`,`consultation`.`id_consultation` AS `id_consultation`,`consultation`.`date_consultation` AS `date_consultation`,`consultation`.`prescription` AS `prescription`,`hospitalisation`.`id_hospitalisation` AS `id_hospitalisation`,`hospitalisation`.`date_entree` AS `date_entree`,`hospitalisation`.`date_sortie` AS `date_sortie` from (((((`payement` join `consultation` on(`payement`.`id_consultation` = `consultation`.`id_consultation`)) join `patients` on(`consultation`.`id_patients` = `patients`.`id_patients`)) join `services` `s1` on(`consultation`.`id_services` = `s1`.`id_services`)) join `hospitalisation` on(`payement`.`id_hospitalisation` = `hospitalisation`.`id_hospitalisation`)) join `services` `s2` on(`hospitalisation`.`id_services` = `s2`.`id_services`)))  ;
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la vue `payement_consultation`
+--
+DROP TABLE IF EXISTS `payement_consultation`;
+
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `payement_consultation`  AS   (select `consultation`.`id_consultation` AS `id_consultation`,`patients`.`nom_patients` AS `nom_patients`,`consultation`.`date_consultation` AS `date_consultation`,`consultation`.`prescription` AS `prescription`,`services`.`nom_service` AS `nom_service` from ((`consultation` join `patients` on(`consultation`.`id_patients` = `patients`.`id_patients`)) join `services` on(`consultation`.`id_services` = `services`.`id_services`)))  ;
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la vue `payement_hospitalisation`
+--
+DROP TABLE IF EXISTS `payement_hospitalisation`;
+
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `payement_hospitalisation`  AS   (select `hospitalisation`.`id_hospitalisation` AS `id_hospitalisation`,`patients`.`nom_patients` AS `nom_patients`,`hospitalisation`.`date_entree` AS `date_entree`,`services`.`nom_service` AS `nom_service` from ((`hospitalisation` join `patients` on(`hospitalisation`.`id_patients` = `patients`.`id_patients`)) join `services` on(`hospitalisation`.`id_services` = `services`.`id_services`)))  ;
 
 --
 -- Index pour les tables déchargées

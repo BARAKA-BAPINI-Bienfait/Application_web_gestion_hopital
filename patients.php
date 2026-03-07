@@ -1,4 +1,9 @@
 <?php
+session_start();
+if (!isset($_SESSION['user'])) {
+    header('Location: login.php');
+    exit(); 
+}
 //connexion a la base de donnee
 include_once "connexion.php";
 
@@ -126,8 +131,9 @@ if (isset($_POST['recherche']) && !empty($_POST['valeur_recherche'])) {
             <form action="" method="post" class="patientformular">
                 <h2>Patient</h2>
                 <?php
-                if (isset($_GET['action'])) {
-                    echo "<p style='color:rgb(41, 10, 76); font-size: 15px;'>Patient ajouté avec succès !</p>";
+                if (isset($_GET['action'])) {?>
+                    <script type="text/javascript"> alert('Patient ajouté avec succès !')</script>
+                <?php    
                 }
                 if (isset($_GET['action2'])) {
                     echo "<p style='color:red;font-size:15px'>Veuillez remplir tous les champs.</p>";
@@ -139,14 +145,29 @@ if (isset($_POST['recherche']) && !empty($_POST['valeur_recherche'])) {
                 <input type="text" name="nomPatient" autofocus required>
                 <label for="">Date de naissance</label>
                 <input type="date" name="date" required>
-                <label for="">Sexe</label>
-                <input type="text" name="sexe" required autofocus>
+
+                <label for="">Genre</label>
+                <select name="sexe" id="" autofocus required>
+                    <option value="">choisie le genre</option>
+                    <option value="M">M</option>
+                    <option value="F">F</option>
+                </select>
+
                 <label for="">Adresse</label>
                 <input type="text" name="adresse" autofocus required>
                 <label for="">Telephone</label>
                 <input type="text" name="telepho" autofocus required>
+
                 <label for="">Groupe sanguin</label>
-                <input type="text" name="sanguin" autofocus required>
+                <select name="sanguin" id="" required>
+                    <option value="">choisie le groupe sanguin</option>
+                    <option value="A">A</option>
+                    <option value="B">B</option>
+                    <option value="AB">AB</option>
+                    <option value="O">O</option>
+                </select>
+
+
                 <div class="btn">
                     <form action="">
                         <button class="btna" name="ajouter">Ajouter</button>
@@ -160,11 +181,13 @@ if (isset($_POST['recherche']) && !empty($_POST['valeur_recherche'])) {
         <div class="tableau">
             <legend>Liste des patients</legend>
             <?php
-            if (isset($_GET['exist'])) {
-                    echo "<p style='color:red;font-size:15px'>patient est utilisee dans une autre table.</p>";
+            if (isset($_GET['exist'])) {?>
+                <script type="text/javascript"> alert('patient est utilisee dans une autre table')</script>
+                <?php
                 }
-            if (isset($_GET['action3'])) {
-                echo "<p style='color:red;'>Le numéro de patient existe déjà.</p>";
+            if (isset($_GET['action3'])) {?>
+                <script type="text/javascript"> alert('Ce numéro de patient existe déjà')</script>
+            <?php    
             }
             ?>
             <div class="recherche">
@@ -223,6 +246,7 @@ if (isset($_POST['recherche']) && !empty($_POST['valeur_recherche'])) {
             </table>
         </div>
     </div>
-</body>
 
+    
+</body>
 </html>

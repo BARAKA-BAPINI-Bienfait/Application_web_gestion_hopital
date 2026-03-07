@@ -1,10 +1,15 @@
 <?php
+session_start();
+if (!isset($_SESSION['user'])) {
+    header('Location: login.php');
+    exit(); 
+}
 //connexion a la base de donnee
 include_once "connexion.php";
 
 //gestion des menus deroulants
 //patient
-$patient = $basedonnee->query('SELECT id_patients,nom_patients FROM patients ORDER BY nom_patients');
+$patientConsultee = $basedonnee->query('SELECT * FROM affichage_patient_consultee ORDER BY nom_patients');
 //consultation
 $consultation = $basedonnee->query('SELECT * from affichage_de_consultation_pour_la_quelle_pas_dhospitalisation order by date_consultation desc');
 //service
@@ -129,11 +134,15 @@ if (isset($_POST['recherche']) && !empty($_POST['valeur_recherche'])) {
             <form action="hospitalisation.php" method="post" class="patientformular">
                 <h2>Hospitalisation</h2>
                 <?php
-                if (isset($_GET['action1'])) {
-                    echo "<p style='color:rgb(41, 10, 76); font-size: 15px;'>Hospitalisation ajouté avec succès !</p>";
+                if (isset($_GET['action1'])) {?>
+                <script type="text/javascript"> alert('Hospitalisation ajouté avec succès !')</script>
+
+                <?php
                 }
+                ?>
+                <?php
                 if (isset($_GET['date'])) {?>
-                <script type="text/javascript"> alert('erreur de la date')</script>
+                <script type="text/javascript"> alert('erreur')</script>
                     <?php 
                 }
                 ?>
@@ -148,10 +157,10 @@ if (isset($_POST['recherche']) && !empty($_POST['valeur_recherche'])) {
                 <select name="id_patient" id="patient_select" required class="deroulant_patient">
                     <option value="">choisir un patient</option>
                     <?php
-                    while ($p = $patient->fetch(PDO::FETCH_ASSOC)) {
+                    while ($pa= $patientConsultee->fetch(PDO::FETCH_ASSOC)) {
                     ?>
-                        <option value="<?= $p['id_patients'] ?>">
-                            <?= htmlspecialchars($p['nom_patients']) ?>
+                        <option value="<?= $pa['id_patients'] ?>">
+                            <?= htmlspecialchars($pa['nom_patients']) ?>
                         </option>
                     <?php } ?>
                 </select>
@@ -163,9 +172,9 @@ if (isset($_POST['recherche']) && !empty($_POST['valeur_recherche'])) {
                     while ($c = $consultation->fetch(PDO::FETCH_ASSOC)) {
                     ?>
                         <option value="<?= $c['id_consultation'] ?>">
-                            consultation du <?= htmlspecialchars($c['date_consultation']) ?>
-                            -Patient:<?= htmlspecialchars($c['nom_patients']) ?>
-                            -Diagnostique:<?= htmlspecialchars($c['diagnostique']) ?>
+                            consult. du: <?= htmlspecialchars($c['date_consultation']) ?>
+                            ,Patient:<?= htmlspecialchars($c['nom_patients']) ?>
+                            ,Diagno.:<?= htmlspecialchars($c['diagnostique']) ?>
                         </option>
                     <?php } ?>
                 </select>
@@ -205,11 +214,15 @@ if (isset($_POST['recherche']) && !empty($_POST['valeur_recherche'])) {
         <div class="tableau">
             <legend>Liste d'hospitalisation</legend>
             <?php
-            if (isset($_GET['action'])) {
-                echo "<p style='color:red;'>Le numéro existe déjà.</p>";
+            if (isset($_GET['action'])) {?>
+                <script type="text/javascript"> alert('Le numéro existe déjà.')</script>
+                <?php
             }
-            if (isset($_GET['exist'])) {
-                echo "<p style='color:red;font-size:15px'>consultation est dans une autre table.</p>";
+            if (isset($_GET['exist'])) {?>
+
+                
+                <script type="text/javascript"> alert('hospitalisation est dans une autre table.')</script>
+                <?php
             }
             ?>
             <div class="recherche">
