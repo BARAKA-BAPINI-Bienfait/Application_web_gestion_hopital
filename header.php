@@ -61,7 +61,7 @@
         .rethy{
             position: relative;
             top: 8px;
-            left: -160px;
+            left: -100px;
             font-weight: bold;
             font-size: 25px;
             color:white;
@@ -83,6 +83,7 @@
             <li><a href="consultation.php">consultation</a></li>
             <li><a href="hospitalisation.php">hospitalisation</a></li>
             <li><a href="payement.php">payement</a></li>
+            <li><a href="tableau_bord.php">tableau de bord</a></li>
             <form action="deconnexion.php" form="post">
                 <button>deconnexion</button>
             </form>

@@ -1,0 +1,237 @@
+/*CREATION DE BASE DE DONNEE DE L'HOPITAL*/
+
+CREATE TABLE patients(
+    id_patients int PRIMARY KEY NOT null,
+    nom_patients varchar(30),
+    date_de_naissance date,
+    sexe varchar(10),
+    adresse varchar(30),
+    telephone varchar(10),
+    groupe_sanguin varchar(10)
+);
+
+create TABLE personnels( 
+id_personnels int(40) PRIMARY KEY not null, 
+nom_personnels varchar(30), 
+role varchar(30) );
+
+create table services(
+    id_services int(40) PRIMARY key NOT null,
+    nom_service varchar(30),
+    description varchar(100)
+);
+
+CREATE table consultation(
+    id_consultation int(40) PRIMARY key not null,
+    date_consultation datetime,
+    diagnostique varchar(100),
+    prescription varchar(100),
+    motif varchar (100),
+    id_patients int(40) not null,
+    id_services int(40) not null,
+    id_personnels int(40) not null,
+    FOREIGN KEY (id_patients) REFERENCES patients(id_patients),
+    FOREIGN key (id_services) REFERENCES services(id_services),
+    FOREIGN key (id_personnels) REFERENCES personnels(id_personnels)
+    );
+
+create TABLE hospitalisation(
+    id_hospitalisation int(40) PRIMARY key not null,
+    date_entree datetime,
+    date_sortie datetime,
+    id_patients int(40) not null,
+    id_consultation int(40) not null,
+    id_services int(40) not null,
+    id_personnels int(40) not null,
+    FOREIGN KEY (id_patients) REFERENCES patients(id_patients),
+    FOREIGN KEY (id_consultation) REFERENCES consultation(id_consultation),
+    FOREIGN key (id_services) REFERENCES services(id_services),
+    FOREIGN key (id_personnels) REFERENCES personnels(id_personnels)
+);
+
+/*contrainte pour la table hospitalisation*/
+
+ALTER TABLE hospitalisation 
+ADD CONSTRAINT chk_dates_coherentes CHECK (date_sortie IS NULL OR date_sortie > date_entree);
+
+ALTER TABLE hospitalisation
+ADD CONSTRAINT date_sortie
+CHECK(
+	date_sortie IS null
+	OR date_sortie > date_entree
+);
+
+CREATE table payement(
+    id_payement int(40) PRIMARY KEY NOT null,
+    date_payement datetime,
+    montant double(12,2),
+    mode_payement varchar(40),
+    statut varchar(40),
+    id_consultation int(40) not null,
+    id_hospitalisation int(40) not null,
+    FOREIGN key (id_consultation) REFERENCES consultation(id_consultation),
+    FOREIGN key (id_hospitalisation) REFERENCES hospitalisation (id_hospitalisation)
+);
+
+
+/*affichage elements de la table consultation*/
+SELECT 
+    consultation.id_consultation,
+    consultation.date_consultation,
+    consultation.diagnostique,
+    consultation.prescription,
+    consultation.motif,
+
+    patients.id_patients,
+    services.id_services,
+    personnels.id_personnels
+
+FROM consultation
+
+INNER JOIN patients 
+    ON consultation.id_patients = patients.id_patients
+
+INNER JOIN services 
+    ON consultation.id_services = services.id_services
+
+INNER JOIN personnels 
+    ON consultation.id_personnels = personnels.id_personnels
+
+ORDER BY consultation.id_consultation DESC;
+
+/*affichage des patients consultee*/
+SELECT consultation.id_consultation,
+       patients.nom_patients,
+       consultation.date_consultation
+FROM consultation
+JOIN patients 
+ON consultation.id_patients = patients.id_patients;
+
+/*affichage des patients consultee pro*/
+SELECT patients.id_patients, patients.nom_patients FROM patients
+JOIN consultation on patients.id_patients = consultation.id_patients
+
+
+/*afficher seulemet les consultation pour les quelles il y a pas d'hospitalisation*/
+SELECT consultation.id_consultation, consultation.date_consultation, patients.nom_patients, consultation.diagnostique
+from consultation inner JOIN patients ON consultation.id_patients = patients.id_patients
+WHERE NOT EXISTS(SELECT 1 
+                 FROM hospitalisation WHERE hospitalisation.id_consultation = consultation.id_consultation);
+
+/*view pour afficher l'hospitalisation*/
+CREATE VIEW affichage_hospitalisation as (SELECT hospitalisation.id_hospitalisation, hospitalisation.date_entree, hospitalisation.date_sortie, patients.nom_patients,
+consultation.id_consultation, services.nom_service, personnels.nom_personnels
+FROM hospitalisation
+INNER JOIN patients ON hospitalisation.id_patients = patients.id_patients
+INNER JOIN consultation ON hospitalisation.id_consultation = consultation.id_consultation
+INNER JOIN services ON hospitalisation.id_services = services.id_services
+INNER JOIN personnels ON hospitalisation.id_personnels = personnels.id_personnels);
+ 
+/*information du patient lors de payement(consultation)*/
+SELECT consultation.id_consultation, patients.nom_patients, consultation.date_consultation, consultation.prescription, services.nom_service
+FROM consultation
+INNER JOIN patients ON consultation.id_patients = patients.id_patients
+INNER join services on consultation.id_services = services.id_services
+
+/*information du patient lors de payement(hospitalisation)*/
+SELECT hospitalisation.id_hospitalisation, patients.nom_patients, hospitalisation.date_entree, services.nom_service
+FROM hospitalisation
+INNER JOIN patients on hospitalisation.id_patients = patients.id_patients
+inner join services on hospitalisation.id_services = services.id_services
+
+
+
+
+/*requette avec AS (quand une table apparait deux fois)*/
+SELECT 
+payement.id_payement,
+payement.date_payement,
+payement.montant,
+payement.mode_payement,
+payement.statut,
+
+patients.nom_patients,
+
+s1.nom_service AS service_consultation,
+s2.nom_service AS service_hospitalisation,
+
+consultation.id_consultation,
+consultation.date_consultation,
+consultation.prescription,
+
+hospitalisation.id_hospitalisation,
+hospitalisation.date_entree,
+hospitalisation.date_sortie
+
+FROM payement
+
+INNER JOIN consultation 
+ON payement.id_consultation = consultation.id_consultation
+
+INNER JOIN patients 
+ON consultation.id_patients = patients.id_patients
+
+INNER JOIN services s1
+ON consultation.id_services = s1.id_services
+
+INNER JOIN hospitalisation 
+ON payement.id_hospitalisation = hospitalisation.id_hospitalisation
+
+INNER JOIN services s2
+ON hospitalisation.id_services = s2.id_services;
+
+
+/*requette sans as*/
+SELECT payement.id_payement, payement.date_payement, payement.montant, payement.mode_payement, payement.statut,
+
+patients.nom_patients,
+services.nom_service,
+
+consultation.id_consultation,
+consultation.date_consultation,
+consultation.prescription,
+
+hospitalisation.id_hospitalisation,
+hospitalisation.date_entree,
+hospitalisation.date_sortie
+
+FROM payement
+INNER JOIN patients ON consultation.id_patients = patients.id_patients
+INNER JOIN services ON consultation.id_services = services.id_services
+
+INNER JOIN consultation ON payement.id_consultation = consultation.id_consultation
+INNER JOIN consultation ON consultation.prescription = consultation.id_consultation
+
+INNER JOIN hospitalisation ON payement.id_hospitalisation = hospitalisation.id_hospitalisation
+INNER JOIN services ON hospitalisation.id_services = services.id_services;
+
+
+
+
+
+
+
+
+
+
+
+SELECT payement.id_payement, payement.date_payement, payement.montant, payement.mode_payement, payement.statut,
+patients.nom_patients,
+consultation.date_consultation,
+consultation.prescription,
+services.nom_service,
+hospitalisation.date_entree FROM payement
+INNER JOIN patients ON payement.id_consultation = patients.id_patients
+INNER JOIN consultation ON payement.id_consultation = consultation.id_consultation
+INNER JOIN services ON payement.id_consultation = services.id_services
+INNER JOIN hospitalisation ON payement.id_hospitalisation = hospitalisation.id_hospitalisation
+
+
+/*affichage payement*/
+CREATE VIEW affichage_payement as(SELECT payement.id_payement, payement.date_payement, payement.montant, payement.mode_payement, payement.statut, 
+patients.nom_patients, services.nom_service, consultation.date_consultation, hospitalisation.date_entree, hospitalisation.date_sortie
+from payement
+LEFT JOIN consultation ON payement.id_consultation = consultation.id_consultation
+LEFT JOIN hospitalisation ON payement.id_hospitalisation = hospitalisation.id_hospitalisation
+LEFT join patients on(consultation.id_consultation or hospitalisation.id_hospitalisation is not NULL AND hospitalisation.id_consultation =consultation.id_consultation)
+left join services on consultation.id_services = services.id_services);

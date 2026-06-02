@@ -13,7 +13,7 @@ $patient = $basedonnee->query('SELECT id_patients,nom_patients FROM patients ORD
 //service
 $service = $basedonnee->query('SELECT id_services, nom_service FROM services ORDER BY nom_service');
 //personnel
-$personnel = $basedonnee->query('SELECT id_personnels, nom_personnels FROM personnels ORDER BY nom_personnels');
+$personnel = $basedonnee->query('SELECT id_personnels, nom_personnels,role FROM personnels ORDER BY nom_personnels');
 
 
 
@@ -60,7 +60,7 @@ if (isset($_POST['ajouter'])) {
                 $service,
                 $personnel,
             ]);
-            header('location: consultation.php?action1=ok');
+            header('location: consultation.php');
        }catch(Exception $e){
             header('Location:consultation.php?action=erreur');
     }
@@ -135,10 +135,6 @@ if (isset($_POST['recherche']) && !empty($_POST['valeur_recherche'])) {
             <form action="consultation.php" method="post" class="patientformular">
                 <h2>consultation</h2>
                 <?php
-                if (isset($_GET['action1'])) {?>
-                    <script type="text/javascript"> alert('Consultation ajouté avec succès !')</script>
-                    <?php
-                }
                 if (isset($_GET['action2'])) {
                     echo "<p style='color:red;font-size:15px'>Veuillez remplir tous les champs.</p>";
                 }
@@ -186,7 +182,8 @@ if (isset($_POST['recherche']) && !empty($_POST['valeur_recherche'])) {
                     while ($p = $personnel->fetch(PDO::FETCH_ASSOC)) {
                     ?>
                         <option value="<?= $p['id_personnels'] ?>">
-                            <?= htmlspecialchars($p['nom_personnels']) ?>
+                            <?= htmlspecialchars($p['nom_personnels']) ?>:
+                            <?= htmlspecialchars($p['role']) ?>
                         </option>
                     <?php } ?>
                 </select>

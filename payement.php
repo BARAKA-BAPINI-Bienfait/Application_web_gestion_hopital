@@ -7,6 +7,9 @@ if (!isset($_SESSION['user'])) {
 //connexion a la base de donnee
 include_once "connexion.php";
 
+//somme total
+$somme = $basedonnee->query('SELECT sum(montant) as montant from payement');
+
 //gestion des menus deroulants
 //iconsultation
 $consultation = $basedonnee->query('SELECT * FROM payement_consultation ORDER BY date_consultation DESC');
@@ -53,7 +56,7 @@ if (isset($_POST['ajouter'])) {
             $numConsultation,
             $numHospitalisation
         ]);
-        header('location:payement.php?action1=ok');
+        header('location:payement.php');
     } catch (Exception $e) {
         header('Location:payement.php?date=erreur');
     }
@@ -97,10 +100,6 @@ if (isset($_POST['recherche']) && !empty($_POST['valeur_recherche'])) {
             <form action="payement.php" method="post" class="patientformular">
                 <h2>Payement</h2>
                 <?php
-                if (isset($_GET['action1'])) {?>
-                    <script type="text/javascript"> alert('Payement ajouté avec succès !')</script>
-                <?php
-                }
                 if (isset($_GET['action2'])) {
                     echo "<p style='color:red;font-size:15px'>Veuillez remplir tous les champs.</p>";
                 }
@@ -232,10 +231,21 @@ if (isset($_POST['recherche']) && !empty($_POST['valeur_recherche'])) {
                         <?php
                         echo "</tr>"
                         ?>
+                        
                     <?php
                     }
                     ?>
+                    <th>
+                        
+                    </th>
                 </tbody>
+
+                <!--gestion de montant total-->
+                <p style="font-weight: bold;">TOTAL GENERAL(montant):
+                    <?php $donnee=$somme->fetch();
+                    echo $donnee['montant'];
+                    ?> fc
+                </p>
             </table>
         </div>
     </div>

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1
--- Généré le : sam. 07 mars 2026 à 12:18
+-- Généré le : mar. 02 juin 2026 à 11:04
 -- Version du serveur : 10.4.32-MariaDB
 -- Version de PHP : 8.0.30
 
@@ -140,8 +140,9 @@ CREATE TABLE `consultation` (
 --
 
 INSERT INTO `consultation` (`id_consultation`, `date_consultation`, `diagnostique`, `prescription`, `motif`, `id_patients`, `id_services`, `id_personnels`) VALUES
-(2, '2026-03-29', 'sida', 'para', 'mot de tete', 1, 12, 2),
-(100, '2026-03-28', 'sida', 'para', 'mot de tete', 2, 12, 2);
+(5, '2026-03-22', 'sida', 'parastamol', 'mal au dos ', 3, 2, 7),
+(6, '2026-03-20', 'maleria', 'parastamol 4es', 'mal a la tete', 5, 2, 7),
+(100, '2026-03-27', 'maleria', 'parastamol 4es', 'mal a la tete', 2, 2, 7);
 
 -- --------------------------------------------------------
 
@@ -158,6 +159,15 @@ CREATE TABLE `hospitalisation` (
   `id_services` int(40) NOT NULL,
   `id_personnels` int(40) NOT NULL
 ) ;
+
+--
+-- Déchargement des données de la table `hospitalisation`
+--
+
+INSERT INTO `hospitalisation` (`id_hospitalisation`, `date_entree`, `date_sortie`, `id_patients`, `id_consultation`, `id_services`, `id_personnels`) VALUES
+(2, '2026-03-14', '2026-03-28', 2, 100, 1, 3),
+(8, '2026-03-07', '2026-03-21', 3, 5, 3, 1),
+(12, '2026-03-06', '2026-03-28', 5, 6, 3, 1);
 
 -- --------------------------------------------------------
 
@@ -180,8 +190,14 @@ CREATE TABLE `patients` (
 --
 
 INSERT INTO `patients` (`id_patients`, `nom_patients`, `date_de_naissance`, `sexe`, `adresse`, `telephone`, `groupe_sanguin`) VALUES
-(1, 'BARAKA BAPINI BIENFAIT', '2004-01-14', 'M', 'HOHO', '0813456738', 'O'),
-(2, 'PACIFIC', '2005-06-08', 'M', 'HOHO', '0813456730', 'A');
+(1, 'PACIFIC', '2003-11-20', 'M', 'HOHO', '0821135167', 'A'),
+(2, 'PACIFIC FAIDA', '2006-11-01', 'M', 'HOHO', '0821135112', 'AB'),
+(3, 'ZAWADI DILE', '2007-02-02', 'M', 'KINDIA', '0832465674', 'O'),
+(5, 'ALESI ANDROA', '2001-02-04', 'F', 'AIROPORT', '0821134167', 'AB'),
+(6, 'HWELOSI LUSI', '2006-03-01', 'F', 'AIROPORT', '0821134465', 'B'),
+(9, 'NDJANGO KOMBU', '2005-12-01', 'M', 'ISP', '0991929345', 'A'),
+(10, 'IRAGI TCHOMBE', '1999-03-01', 'F', 'KAZUNGA', '0821137461', 'B'),
+(11, 'JOEL FABRICE', '2020-01-01', 'M', 'KAZUNGA', '0821324356', 'B');
 
 -- --------------------------------------------------------
 
@@ -198,6 +214,13 @@ CREATE TABLE `payement` (
   `id_consultation` int(40) NOT NULL,
   `id_hospitalisation` int(40) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Déchargement des données de la table `payement`
+--
+
+INSERT INTO `payement` (`id_payement`, `date_payement`, `montant`, `mode_payement`, `statut`, `id_consultation`, `id_hospitalisation`) VALUES
+(1, '2026-03-28', 1000.00, 'cach', 'tout payer', 100, 2);
 
 -- --------------------------------------------------------
 
@@ -243,7 +266,9 @@ CREATE TABLE `personnels` (
 --
 
 INSERT INTO `personnels` (`id_personnels`, `nom_personnels`, `role`) VALUES
-(2, 'JALOUS', 'informaticien');
+(1, 'PALUKU', 'medecin'),
+(3, 'JOEL', 'infirmier'),
+(7, 'BAPINI', 'recepteur');
 
 -- --------------------------------------------------------
 
@@ -262,9 +287,10 @@ CREATE TABLE `services` (
 --
 
 INSERT INTO `services` (`id_services`, `nom_service`, `description`) VALUES
-(10, 'medecine interne', 'soin'),
-(11, 'chirugie', 'operation'),
-(12, 'cabinet consultation', 'consultation');
+(1, 'mecine interne', 'tout soins'),
+(2, 'cabinet consultation', 'consul.'),
+(3, 'chirugie', 'operation'),
+(4, 'pediatrie', 'soin enfant');
 
 -- --------------------------------------------------------
 

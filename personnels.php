@@ -4,13 +4,19 @@ include_once "connexion.php";
 
 //suppression de la base de donnee patients
 if (isset($_POST['delete']) && isset($_POST['id_a_delete'])) {
-    $requette_del=$basedonnee->prepare('DELETE FROM personnels WHERE id_personnels=?');
-    $requette_del->execute([$_POST['id_a_delete']]);
+    $requette_del = $basedonnee->prepare('DELETE FROM personnels WHERE id_personnels=?');
 
-
-    // Redirection pour rafraîchir le tableau
-    header('Location: personnels.php');
-    exit();
+    try {
+        $requette_del->execute([$_POST['id_a_delete']]);
+    } catch (PDOException $e) {
+        if ($e->getCode() == 23000) {
+            // Redirection pour rafraîchir le tableau
+            header('Location: personnels.php?person=erreur');
+            exit();
+        } else {
+            echo "<p style='color:red;'>Erreur système : " . $e->getMessage() . "</p>";
+        }
+    }
 }
 
 //insertion dans la base de donnee
@@ -32,7 +38,7 @@ if (isset($_POST['ajouter'])) {
                 $nomPersonnel,
                 $role,
             ]);
-            header('location: personnels.php?action=erreur');
+            header('location: personnels.php');
         } catch (PDOException $e) {
             if ($e->getCode() == 23000) {
                 header('location: personnels.php?action3=erreur');
@@ -99,10 +105,14 @@ if (isset($_POST['recherche']) && !empty($_POST['valeur_recherche'])) {
             <form action="" method="post" class="patientformular">
                 <h2>Personnels</h2>
                 <?php
-                if (isset($_GET['action'])) {?>
-                    <script type="text/javascript"> alert('Service ajouté avec succès !')</script>
-                    <?php
+
+                if (isset($_GET['person'])) { ?>
+                    <script type="text/javascript">
+                        alert('le personnel est utilisee dans une autre table')
+                    </script>
+                <?php
                 }
+
                 if (isset($_GET['action2'])) {
                     echo "<p style='color:red;font-size:15px'>Veuillez remplir tous les champs.</p>";
                 }
@@ -126,9 +136,11 @@ if (isset($_POST['recherche']) && !empty($_POST['valeur_recherche'])) {
         <div class="tableau">
             <legend>Liste des personnels</legend>
             <?php
-            if (isset($_GET['action3'])) {?>
-                <script type="text/javascript"> alert('Le numéro de service existe déjà !')</script>
-                <?php
+            if (isset($_GET['action3'])) { ?>
+                <script type="text/javascript">
+                    alert('Le numéro de service existe déjà !')
+                </script>
+            <?php
             }
             ?>
             <div class="recherche">

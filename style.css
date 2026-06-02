@@ -305,7 +305,25 @@ textarea{
     outline: none;
 
 }
+.total{
+    font-size: 40px;
+    font-weight: bold;
+}
 
+/*impression
+@media print {
+    body *{
+        visibility: hidden;
+    }
+    #zoneim, #zoneim *{
+        visibility: hidden;
+    }
+    #zoneim{
+        position: absolute;
+        left: 0;
+        top: 0;
+    }
+}*/
 
 
 

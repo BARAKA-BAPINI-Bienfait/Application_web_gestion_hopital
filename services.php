@@ -43,7 +43,7 @@ if (isset($_POST['ajouter'])) {
                 $nomService,
                 $description,
             ]);
-            header('location: services.php?action=erreur');
+            header('location: services.php');
         } catch (PDOException $e) {
             if ($e->getCode() == 23000) {
                 header('location: services.php?action3=erreur');
@@ -116,12 +116,6 @@ if (isset($_POST['recherche']) && !empty($_POST['valeur_recherche'])) {
             <form action="" method="post" class="patientformular">
                 <h2>services</h2>
                 <?php
-                if (isset($_GET['action'])) { ?>
-                    <script type="text/javascript">
-                        alert('Service ajouté avec succès !')
-                    </script>
-                <?php
-                }
                 if (isset($_GET['action2'])) {
                     echo "<p style='color:red;font-size:15px'>Veuillez remplir tous les champs.</p>";
                 }
@@ -151,8 +145,11 @@ if (isset($_POST['recherche']) && !empty($_POST['valeur_recherche'])) {
                 </script>
             <?php
             }
-            if (isset($_GET['action3'])) {
-                echo "<p style='color:red;'>Le numéro de service existe déjà.</p>";
+            if (isset($_GET['action3'])) {?>
+            <script type="text/javascript">
+                    alert('Le numéro de service existe déjà.')
+                </script>
+                <?php
             }
             ?>
             <div class="recherche">

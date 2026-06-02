@@ -15,7 +15,7 @@ $consultation = $basedonnee->query('SELECT * from affichage_de_consultation_pour
 //service
 $service = $basedonnee->query('SELECT id_services, nom_service FROM services ORDER BY nom_service');
 //personnel
-$personnel = $basedonnee->query('SELECT id_personnels, nom_personnels FROM personnels ORDER BY nom_personnels');
+$personnel = $basedonnee->query('SELECT id_personnels, nom_personnels, role FROM personnels ORDER BY nom_personnels');
 
 //suppression de la base de donnee patients
 if (isset($_POST['delete']) && isset($_POST['id_a_delete'])) {
@@ -60,7 +60,7 @@ if (isset($_POST['ajouter'])) {
                 $numService,
                 $numPersonnel,
             ]);
-            header('location: hospitalisation.php?action1=ok');
+            header('location: hospitalisation.php');
         } catch (Exception $e) {
             header('Location:hospitalisation.php?date=erreur');
         }
@@ -134,13 +134,6 @@ if (isset($_POST['recherche']) && !empty($_POST['valeur_recherche'])) {
             <form action="hospitalisation.php" method="post" class="patientformular">
                 <h2>Hospitalisation</h2>
                 <?php
-                if (isset($_GET['action1'])) {?>
-                <script type="text/javascript"> alert('Hospitalisation ajouté avec succès !')</script>
-
-                <?php
-                }
-                ?>
-                <?php
                 if (isset($_GET['date'])) {?>
                 <script type="text/javascript"> alert('erreur')</script>
                     <?php 
@@ -198,7 +191,8 @@ if (isset($_POST['recherche']) && !empty($_POST['valeur_recherche'])) {
                     while ($p = $personnel->fetch(PDO::FETCH_ASSOC)) {
                     ?>
                         <option value="<?= $p['id_personnels'] ?>">
-                            <?= htmlspecialchars($p['nom_personnels']) ?>
+                            <?= htmlspecialchars($p['nom_personnels']) ?>:
+                            <?= htmlspecialchars_decode($p['role']) ?>
                         </option>
                     <?php } ?>
                 </select>

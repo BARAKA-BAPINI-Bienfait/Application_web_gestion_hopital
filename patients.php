@@ -54,7 +54,7 @@ if (isset($_POST['ajouter'])) {
                 $telephone,
                 $groupes
             ]);
-            header('location: patients.php?action=erreur');
+            header('location: patients.php');
         } catch (PDOException $e) {
             if ($e->getCode() == 23000) {
                 header('location:patients.php?action3=erreur');
@@ -131,10 +131,7 @@ if (isset($_POST['recherche']) && !empty($_POST['valeur_recherche'])) {
             <form action="" method="post" class="patientformular">
                 <h2>Patient</h2>
                 <?php
-                if (isset($_GET['action'])) {?>
-                    <script type="text/javascript"> alert('Patient ajouté avec succès !')</script>
-                <?php    
-                }
+                
                 if (isset($_GET['action2'])) {
                     echo "<p style='color:red;font-size:15px'>Veuillez remplir tous les champs.</p>";
                 }
@@ -174,10 +171,10 @@ if (isset($_POST['recherche']) && !empty($_POST['valeur_recherche'])) {
                     </form>
                     <button class="btnm" name="modifier">Modifier</button>
                     <input type="reset" value="Annuler">
+                    <!--<button class="btnm" onclick="window.print()">imprimer</button>-->
                 </div>
             </form>
         </div>
-
         <div class="tableau">
             <legend>Liste des patients</legend>
             <?php
@@ -196,6 +193,10 @@ if (isset($_POST['recherche']) && !empty($_POST['valeur_recherche'])) {
                     <button type="submit" name="recherche">Recherche</button>
                     <button type="reset"><a href="patients.php">Avoir plus</a></button>
                 </form>
+            </div>
+
+            <div id="zoneim">
+                
             </div>
             <table class="tab">
                 <thead>

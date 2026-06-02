@@ -56,8 +56,12 @@ if (isset($_POST['connect'])) {
             <input type="text" name="user" required autofocus value="bapini">
             <label for="">Mot de passe</label>
             <input type="password" name="motdepasse" id="" required autofocus value="12345">
-            <input class="input1" type="submit" value="connecter" name="connect"><input class="input1" type="reset" value="annuler" name="reset">
+            <input class="input1" type="submit" value="connecter" name="connect"><input class="input1" type="reset" value="annuler" name="
+            reset">
+            
         </form>
+        <label for="">Utilisateur: bapini</label>
+        <label for="">mot de passe:12345</label>
     </div>
     
 </body>
